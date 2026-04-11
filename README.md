@@ -5,9 +5,9 @@ Ky projekt është punuar për lëndën Rrjetat Kompjuterike.
 Ai implementon komunikim mes serverit dhe klientit duke përdorur Node.js dhe sockets.
 
 ## Anëtaret e grupit
-- ELMA ADEMI  
-- AURELA KAJTAZI  
-- AULONA XHEMA  
+- AURELA KAJTAZI
+- AULONA XHEMA 
+- ELMA ADEMI
 
 ## Teknologjitë e përdorura
 - Node.js
