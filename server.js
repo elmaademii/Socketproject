@@ -29,6 +29,7 @@ const server = net.createServer((socket) => {
 
         const isAdmin = (clientIP === adminIP);
 
+<<<<<<< HEAD
         try {
             switch (command) {
              case "AUTH": 
@@ -72,6 +73,16 @@ const server = net.createServer((socket) => {
             }
         } catch (err) {
             socket.write(`GABIM SERVERI: ${err.message}\n`);
+=======
+
+
+        // pjesa e try catch dhe logjika kryesore e ketij projekti. 
+        // Duhet te perfshihe case per autentifikim, read, write dhe execute
+        try {
+           
+        } catch (error) {
+
+>>>>>>> 60d51ae6ed8e6a01706ca55dd29f6405e3041a78
         }
     });
 
@@ -82,6 +93,7 @@ const server = net.createServer((socket) => {
 server.listen(PORT, HOST, () => {
     console.log(`[!] Serveri po dëgjon në ${HOST}:${PORT}`);
 });
+<<<<<<< HEAD
 try {
 switch (command) {
 case "AUTH":
@@ -126,3 +138,5 @@ socket.write("SERVER: Komandë e panjohur.\n");
 } catch (err) {
 socket.write(`GABIM SERVERI: ${err.message}\n`);
 }
+=======
+>>>>>>> 60d51ae6ed8e6a01706ca55dd29f6405e3041a78
