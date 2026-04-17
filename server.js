@@ -6,8 +6,13 @@ const { exec } = require("child_process");
 const PORT = 5001;
 const HOST = "0.0.0.0";
 
-const dir = "./server_files";
+// Folderi kryesor
+const dir = path.join(__dirname, "server_files");
 if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+
+// log file brenda server_files
+const logPath = path.join(dir, "log.txt");
+if (!fs.existsSync(logPath)) fs.writeFileSync(logPath, "");
 
 let admins = [];
 let clients = [];
@@ -34,7 +39,8 @@ const server = net.createServer((socket) => {
         const input = data.toString().trim();
         console.log(`[${clientIP}]: ${input}`);
 
-        fs.appendFileSync("log.txt", `[${clientIP}]: ${input}\n`);
+        // LOG në file korrekt
+        fs.appendFileSync(logPath, `[${clientIP}]: ${input}\n`);
 
         const parts = input.split(" ");
         const command = parts[0].toUpperCase();
@@ -48,9 +54,7 @@ const server = net.createServer((socket) => {
 
                 case "AUTH":
                     if (arg1 === "admin123") {
-                        if (!admins.includes(clientIP)) {
-                            admins.push(clientIP);
-                        }
+                        if (!admins.includes(clientIP)) admins.push(clientIP);
                         socket.write("SERVER: Jeni ADMIN.\n");
                     } else {
                         socket.write("SERVER: Password gabim.\n");
@@ -70,8 +74,8 @@ const server = net.createServer((socket) => {
                         return socket.write("File nuk ekziston!\n");
                     }
 
-                    const dataFile = fs.readFileSync(filePath);
-                    socket.write(`\n--- ${arg1} ---\n${dataFile}\n`);
+                    const fileData = fs.readFileSync(filePath, "utf8");
+                    socket.write(`\n--- ${arg1} ---\n${fileData}\n`);
                     break;
 
                 case "WRITE":
@@ -97,10 +101,8 @@ const server = net.createServer((socket) => {
                 case "MSG":
                     const message = content;
 
-                    // ruaj në text.txt
-                    fs.appendFileSync("text.txt", `[${clientIP}]: ${message}\n`);
+                    fs.appendFileSync(path.join(dir, "text.txt"), `[${clientIP}]: ${message}\n`);
 
-                    // dërgo te klientët tjerë
                     clients.forEach((client) => {
                         if (client !== socket) {
                             client.write(`[${clientIP}]: ${message}\n`);
@@ -111,11 +113,13 @@ const server = net.createServer((socket) => {
                     break;
 
                 case "READCHAT":
-                    if (!fs.existsSync("text.txt")) {
+                    const chatPath = path.join(dir, "text.txt");
+
+                    if (!fs.existsSync(chatPath)) {
                         return socket.write("text.txt nuk ekziston!\n");
                     }
 
-                    const chat = fs.readFileSync("text.txt", "utf8");
+                    const chat = fs.readFileSync(chatPath, "utf8");
                     socket.write(`\n--- CHAT HISTORY ---\n${chat}\n`);
                     break;
 

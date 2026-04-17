@@ -1,0 +1,7 @@
+Pershendetje[192.168.1.20]: MSG Qkemi
+[192.168.1.20]: READCHAT
+[192.168.1.20]: WRITE test.txt Pershendetje nga klienti
+[192.168.1.20]: READFILE text.txt
+[192.168.1.20]: READFILE log.txt
+[192.168.1.20]: MSG Pershendetje te gjitheve
+[192.168.1.20]: READCHAT

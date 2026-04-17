@@ -2,3 +2,13 @@
 [192.168.1.20]: MSG Pershendetje nga Elma
 [192.168.1.20]: READCHAT
 [192.168.1.20]: MSG Pershendetje
+[192.168.1.20]: Auth<1234?
+[192.168.1.20]: READFILE <log.txt>
+[192.168.1.20]: MSG Pershendetje te gjitheve
+[192.168.1.20]: READFILE log.txt
+[192.168.1.20]: AUTH 1234
+[192.168.1.20]: AUTH admin123
+[192.168.1.20]: READFILE log.txt
+[192.168.1.20]: AUTH 1234
+[192.168.1.20]: READFILE log.txt
+[192.168.1.20]: READFILE log.txt
