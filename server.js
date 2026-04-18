@@ -9,29 +9,24 @@ const HOST = "0.0.0.0";
 const dir = "./server_files";
 if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 
-let admins = [];
 let clients = [];
 
 const server = net.createServer((socket) => {
     const clientIP = socket.remoteAddress.replace(/^.*:/, '');
+    const clientPort = socket.remotePort;
+    const clientID = `${clientIP}:${clientPort}`;
     console.log(`[+] Klient i ri: ${clientIP}`);
 
+    socket.isAdmin = false;
     clients.push(socket);
 
-    socket.write(
-        "MIRËSEVINI!\n" +
-        "Komandat:\n" +
-        "AUTH <pass>\n" +
-        "READ\n" +
-        "READFILE <file>\n" +
-        "WRITE <file> <text>\n" +
-        "EXECUTE <cmd>\n" +
-        "MSG <text>\n" +
-        "READCHAT\n"
-    );
+    socket.write(`SERVER: MIRËSEVINI ${clientID}!\n`);
+    socket.write("Komandat:\nAUTH admin123 | READ | READFILE <file> | WRITE <file> <text> | EXECUTE <cmd> | MSG <text> | READCHAT\n");
 
     socket.on("data", (data) => {
         const input = data.toString().trim();
+        if (!input) return;
+        
         console.log(`[${clientIP}]: ${input}`);
 
         fs.appendFileSync("log.txt", `[${clientIP}]: ${input}\n`);
