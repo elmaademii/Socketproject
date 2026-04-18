@@ -10,72 +10,101 @@ const HOST = "0.0.0.0";
 const dir = path.join(__dirname, "server_files");
 if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 
+<<<<<<< HEAD
 // log file brenda server_files
 const logPath = path.join(dir, "log.txt");
 if (!fs.existsSync(logPath)) fs.writeFileSync(logPath, "");
 
 let admins = [];
+=======
+>>>>>>> d8d3f2a08e8df0a1eb22edd20d7187430b9ade79
 let clients = [];
 
 const server = net.createServer((socket) => {
     const clientIP = socket.remoteAddress.replace(/^.*:/, '');
+    const clientPort = socket.remotePort;
+    const clientID = `${clientIP}:${clientPort}`;
     console.log(`[+] Klient i ri: ${clientIP}`);
 
+    socket.isAdmin = false;
     clients.push(socket);
 
-    socket.write(
-        "MIRËSEVINI!\n" +
-        "Komandat:\n" +
-        "AUTH <pass>\n" +
-        "READ\n" +
-        "READFILE <file>\n" +
-        "WRITE <file> <text>\n" +
-        "EXECUTE <cmd>\n" +
-        "MSG <text>\n" +
-        "READCHAT\n"
-    );
+    socket.write(`SERVER: MIRËSEVINI ${clientID}!\n`);
+    socket.write("Komandat:\nAUTH admin123 | READ | READFILE <file> | WRITE <file> <text> | EXECUTE <cmd> | MSG <text> | READCHAT\n");
 
     socket.on("data", (data) => {
         const input = data.toString().trim();
+        if (!input) return;
+
         console.log(`[${clientIP}]: ${input}`);
 
+<<<<<<< HEAD
         // LOG në file korrekt
         fs.appendFileSync(logPath, `[${clientIP}]: ${input}\n`);
+=======
+       try {
+            fs.appendFileSync("log.txt", `[${clientID}]: ${input}\n`);
+        } catch (e) {
+            console.error("Log gabim:", e);
+        }
+>>>>>>> d8d3f2a08e8df0a1eb22edd20d7187430b9ade79
 
-        const parts = input.split(" ");
-        const command = parts[0].toUpperCase();
-        const arg1 = parts[1];
-        const content = parts.slice(2).join(" ");
+        const spaceIndex = input.indexOf(" ");
 
-        const isAdmin = admins.includes(clientIP);
+        let command = input.toUpperCase();
+        let rest = "";
+
+        if (spaceIndex !== -1) {
+            command = input.substring(0, spaceIndex).toUpperCase();
+            rest = input.substring(spaceIndex + 1);
+        }
+
+        const args = rest.split(" ");
+        const arg1 = args[0];
 
         try {
             switch (command) {
 
                 case "AUTH":
                     if (arg1 === "admin123") {
+<<<<<<< HEAD
                         if (!admins.includes(clientIP)) admins.push(clientIP);
                         socket.write("SERVER: Jeni ADMIN.\n");
+=======
+                        socket.isAdmin = true;
+                        socket.write("Jeni ADMIN! (WRITE/EXECUTE OK)\n");
+>>>>>>> d8d3f2a08e8df0a1eb22edd20d7187430b9ade79
                     } else {
-                        socket.write("SERVER: Password gabim.\n");
+                        socket.write("Password gabim!\n");
                     }
                     break;
 
                 case "READ":
                     const files = fs.readdirSync(dir);
-                    socket.write(`FILES: ${files.join(", ")}\n`);
+                    socket.write(`FILES: ${files.join(", ") || "Bosh"}\n`);
                     break;
 
                 case "READFILE":
-                    if (!arg1) return socket.write("Përdor: READFILE file.txt\n");
+                    if (!arg1) {
+                        socket.write("Përdor: READFILE <file>\n");
+                        break;
+                    }
 
-                    const filePath = path.join(dir, arg1);
+<<<<<<< HEAD
+                    const fileData = fs.readFileSync(filePath, "utf8");
+                    socket.write(`\n--- ${arg1} ---\n${fileData}\n`);
+=======
+                    const safeReadFile = path.basename(arg1);
+                    const filePath = path.join(dir, safeReadFile);
+
                     if (!fs.existsSync(filePath)) {
-                        return socket.write("File nuk ekziston!\n");
+                        socket.write("File nuk ekziston\n");
+                        break;
                     }
 
                     const fileData = fs.readFileSync(filePath, "utf8");
-                    socket.write(`\n--- ${arg1} ---\n${fileData}\n`);
+                    socket.write(`${safeReadFile}:\n${fileData}\n---\n`);
+>>>>>>> d8d3f2a08e8df0a1eb22edd20d7187430b9ade79
                     break;
 
                 case "WRITE":
