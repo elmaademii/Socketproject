@@ -60,4 +60,4 @@ Të gjitha mesazhet ruhen në log.txt.
 ## Punuar nga
 - Aulona Xhema  
 - Aurela Kajtazi  
-- Elma Ademi  
+- Elma Ademi
