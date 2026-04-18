@@ -15,9 +15,10 @@ const server = net.createServer((socket) => {
     const clientIP = socket.remoteAddress.replace(/^.*:/, '');
     const clientPort = socket.remotePort;
     const clientID = `${clientIP}:${clientPort}`;
-    console.log(`[+] Klient i ri: ${clientIP}`);
-
-    socket.isAdmin = false;
+    
+    console.log(`[+] Klient: ${clientID}`);
+    
+    socket.isAdmin = false;  
     clients.push(socket);
 
     socket.write(`SERVER: MIRËSEVINI ${clientID}!\n`);
@@ -27,9 +28,9 @@ const server = net.createServer((socket) => {
         const input = data.toString().trim();
         if (!input) return;
 
-        console.log(`[${clientIP}]: ${input}`);
+        console.log(`[${clientID}]: ${input}`);
 
-       try {
+        try {
             fs.appendFileSync("log.txt", `[${clientID}]: ${input}\n`);
         } catch (e) {
             console.error("Log gabim:", e);
@@ -84,68 +85,100 @@ const server = net.createServer((socket) => {
                     break;
 
                 case "WRITE":
-                    if (!isAdmin) return socket.write("Nuk ke WRITE permission!\n");
-                    if (!arg1 || !content) {
-                        return socket.write("Përdor: WRITE file.txt tekst\n");
+                    if (!socket.isAdmin) {
+                        socket.write("Vetëm ADMIN! Bëj AUTH\n");
+                        break;
                     }
 
-                    fs.writeFileSync(path.join(dir, arg1), content);
-                    socket.write("File u krijua me sukses.\n");
+                    if (!arg1 || !rest) {
+                        socket.write("Përdor: WRITE <file> <text>\n");
+                        break;
+                    }
+
+                    const safeWriteFile = path.basename(arg1);
+                    const text = rest.substring(arg1.length + 1);
+                    fs.writeFileSync(path.join(dir, safeWriteFile), text);
+
+                    socket.write(`'${safeWriteFile}' u krijua / përditësua!\n`);
                     break;
 
                 case "EXECUTE":
-                    if (!isAdmin) return socket.write("Nuk ke EXECUTE permission!\n");
+                    if (!socket.isAdmin) {
+                        socket.write("Vetëm ADMIN!\n");
+                        break;
+                    }
 
-                    exec(arg1, (err, stdout, stderr) => {
-                        if (err) return socket.write(`Error: ${err.message}\n`);
-                        if (stderr) return socket.write(`STDERR: ${stderr}\n`);
-                        socket.write(`OUTPUT:\n${stdout}\n`);
+                    if (!rest) {
+                        socket.write("Përdor: EXECUTE <cmd>\n");
+                        break;
+                    }
+
+                    exec(rest, (err, stdout, stderr) => {
+                        if (err) {
+                            socket.write(`Error: ${err.message}\n`);
+                            return;
+                        }
+                        if (stderr) socket.write(stderr + "\n");
+                        socket.write(stdout || "OK\n");
                     });
                     break;
 
                 case "MSG":
-                    const message = content;
+                    if (!rest) {
+                        socket.write("Përdor: MSG <teksti>\n");
+                        break;
+                    }
 
-                    // ruaj në text.txt
-                    fs.appendFileSync("text.txt", `[${clientIP}]: ${message}\n`);
-
-                    // dërgo te klientët tjerë
-                    clients.forEach((client) => {
-                        if (client !== socket) {
-                            client.write(`[${clientIP}]: ${message}\n`);
+                    clients.forEach(client => {
+                        if (!client.destroyed) {
+                            client.write(`${clientID}: ${rest}\n`);
                         }
                     });
-
-                    socket.write("Mesazhi u ruajt dhe u dërgua.\n");
                     break;
 
                 case "READCHAT":
-                    if (!fs.existsSync("text.txt")) {
-                        return socket.write("text.txt nuk ekziston!\n");
+                    if (!fs.existsSync("log.txt")) {
+                        socket.write("Chat/Log bosh\n");
+                        break;
                     }
 
-                    const chat = fs.readFileSync("text.txt", "utf8");
-                    socket.write(`\n--- CHAT HISTORY ---\n${chat}\n`);
+                    const chat = fs.readFileSync("log.txt", "utf8");
+                    socket.write(`CHAT/LOG:\n${chat}\n---\n`);
                     break;
 
                 default:
                     socket.write("Komandë e panjohur.\n");
             }
+
         } catch (err) {
-            socket.write(`GABIM: ${err.message}\n`);
+            socket.write(`Gabim: ${err.message}\n`);
+            console.error(`${clientID} error:`, err);
         }
     });
 
-    socket.on("end", () => {
-        console.log(`[-] ${clientIP} u shkëput`);
+    const removeClient = () => {
+        console.log(`[-] ${clientID} disconnect`);
         clients = clients.filter(c => c !== socket);
-    });
+    };
+
+    socket.on("end", removeClient);
 
     socket.on("error", (err) => {
-        console.log(`Gabim: ${err.message}`);
+        console.log(`${clientID} error:`, err.message);
+        removeClient();
+    });
+
+    socket.setTimeout(300000);
+    socket.on("timeout", () => {
+        socket.end("Timeout\n");
+        removeClient();
     });
 });
 
+server.on("error", (err) => {
+    console.error("Server error:", err.code || err.message);
+});
+
 server.listen(PORT, HOST, () => {
-    console.log(`Serveri po dëgjon në ${HOST}:${PORT}`);
+    console.log(`Server në ${HOST}:${PORT}`);
 });
