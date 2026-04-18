@@ -1,32 +1,67 @@
-# Projekt – Rrjetat Kompjuterike
+Server & Client – Rrjetat Kompjuterike
+Përshkrimi i Projektit
 
-## Përshkrimi
-Ky projekt është punuar për lëndën Rrjetat Kompjuterike.
-Ai implementon komunikim mes serverit dhe klientit duke përdorur Node.js dhe sockets.
+Ky projekt implementon një sistem komunikimi Client-Server duke përdorur Node.js (TCP sockets).
 
-## Anëtaret e grupit
-- AURELA KAJTAZI
-- AULONA XHEMA 
-- ELMA ADEMI
+Serveri pranon lidhje nga shumë klientë dhe u mundëson atyre të komunikojnë, të lexojnë dhe të shkruajnë në file, si dhe të ekzekutojnë komanda (në varësi të privilegjeve).
 
-## Teknologjitë e përdorura
-- Node.js
-- JavaScript
-- Socket Programming
-- VS Code
-- GitHub
+Qëllimi
+Të implementohet komunikimi Client-Server
+Të përdoren socket TCP në Node.js
+Të menaxhohen klientë të shumtë njëkohësisht
+Të implementohen privilegje (ADMIN vs USER)
+Të ruhet komunikimi në log
+⚙️ Si funksionon
+🔹 Serveri
+Vendoset IP dhe porti
+Serveri dëgjon (listen) për lidhje nga klientët
+Pranon kërkesa (request) nga klientët
+Lexon dhe përpunon mesazhet
+Menaxhon file në folderin server_files
+Ruajnë të gjitha mesazhet në log.txt
+🔹 Klienti
+Krijon lidhje me serverin përmes IP dhe portit
+Dërgon komanda nga terminali
+Merr përgjigje nga serveri
 
-## Funksionimi
-- Serveri dëgjon në një port të caktuar
-- Klienti lidhet me serverin përmes IP dhe portit
-- Të dhënat mund të ruhen në file `text.txt`
+ Komandat
+AUTH admin123 → bëhesh ADMIN
+READ → liston file-t
+READFILE <file> → lexon një file
+WRITE <file> <text> → shkruan në file (vetëm ADMIN)
+EXECUTE <cmd> → ekzekuton komandë (ADMIN)
+MSG <text> → dërgon mesazh te të gjithë klientët
+READCHAT → lexon log-un
+exit → del nga klienti
 
-## Si ekzekutohet
-npm install
+▶️ Si të ekzekutohet
+Sigurohu që ke të instaluar Node.js
+Starto serverin:
 node server.js
+Starto klientin:
+node client.js
+(Opsionale) Ndrysho IP në client.js nëse serveri është në pajisje tjetër
 
-## Qëllimi
-Qëllimi i projektit është të demonstrojë komunikimin në rrjet mes serverit dhe klientit.
+📁 Struktura e Projektit
+project/
+│
+├── server.js
+├── client.js
+├── log.txt
+├── server_files/
+└── README.md
 
-## Viti
-2026
+Siguria & Privilegjet
+Vetëm klienti që bën AUTH admin123 është ADMIN
+ADMIN ka akses në:
+WRITE
+EXECUTE
+
+Log / Chat
+Të gjitha mesazhet ruhen në: log.txt
+
+
+Punuar nga
+Aulona Xhema
+Aurela Kajtazi
+Elma Ademi
