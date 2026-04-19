@@ -99,7 +99,7 @@ const server = net.createServer((socket) => {
                     const text = rest.substring(arg1.length + 1);
                     fs.writeFileSync(path.join(dir, safeWriteFile), text);
 
-                    socket.write(`'${safeWriteFile}' u krijua / përditësua!\n`);
+                    socket.write(`'${safeWriteFile}' u krijua!\n`);
                     break;
 
                 case "EXECUTE":
