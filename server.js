@@ -67,13 +67,13 @@ const server = net.createServer((socket) => {
 
                 case "AUTH":
                     if (arg1 === "admin123") {
-<<<<<<< HEAD
+
                         if (!admins.includes(clientIP)) admins.push(clientIP);
                         socket.write("SERVER: Jeni ADMIN.\n");
-=======
+
                         socket.isAdmin = true;
                         socket.write("Jeni ADMIN! (WRITE/EXECUTE OK)\n");
->>>>>>> d8d3f2a08e8df0a1eb22edd20d7187430b9ade79
+
                     } else {
                         socket.write("Password gabim!\n");
                     }
@@ -90,10 +90,6 @@ const server = net.createServer((socket) => {
                         break;
                     }
 
-<<<<<<< HEAD
-                    const fileData = fs.readFileSync(filePath, "utf8");
-                    socket.write(`\n--- ${arg1} ---\n${fileData}\n`);
-=======
                     const safeReadFile = path.basename(arg1);
                     const filePath = path.join(dir, safeReadFile);
 
@@ -104,7 +100,6 @@ const server = net.createServer((socket) => {
 
                     const fileData = fs.readFileSync(filePath, "utf8");
                     socket.write(`${safeReadFile}:\n${fileData}\n---\n`);
->>>>>>> d8d3f2a08e8df0a1eb22edd20d7187430b9ade79
                     break;
 
                 case "WRITE":
